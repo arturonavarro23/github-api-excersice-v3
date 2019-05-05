@@ -3,7 +3,6 @@ import { Grid, Row, Col, Modal } from 'react-bootstrap';
 import Form from './components/form';
 import Results from './components/results';
 import Comments from './components/comments';
-import Loader from '../loader';
 import GitHub from '../../services/github';
 import useState from '../../hooks/useState';
 
