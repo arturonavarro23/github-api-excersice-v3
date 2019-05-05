@@ -1,10 +1,8 @@
-import React, { lazy } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
-import lazyComponent from '../hoc/lazyComponent';
+import Repositories from './repositories';
+import User from './user';
 import './App.scss';
-
-const Repositories = lazy(() => import('./repositories'));
-const User = lazy(() => import('./user'));
 
 const App = () => {
   return (
@@ -17,8 +15,8 @@ const App = () => {
             </Link>
           </p>
         </header>
-        <Route path="/" exact component={lazyComponent(Repositories)} />
-        <Route path="/user/:name" component={lazyComponent(User)} />
+        <Route path="/" exact component={Repositories} />
+        <Route path="/user/:name" component={User} />
       </div>
     </BrowserRouter>
   );

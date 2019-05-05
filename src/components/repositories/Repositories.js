@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment, Suspense } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { Grid, Row, Col, Modal } from 'react-bootstrap';
 import Form from './components/form';
 import Results from './components/results';
@@ -116,12 +116,10 @@ const Repositories = () => {
           <Modal.Title>Comments</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Suspense fallback={<Loader />}>
-            <Comments 
-              isLoading={isFetchingComments}
-              comments={comments}
-            />
-          </Suspense>
+          <Comments 
+            isLoading={isFetchingComments}
+            comments={comments}
+          />
         </Modal.Body>
       </Modal>
     </Fragment>
