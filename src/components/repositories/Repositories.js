@@ -1,31 +1,33 @@
-import React, { Component, Fragment } from 'react';
+import React, { useEffect, Fragment, Suspense } from 'react';
 import { Grid, Row, Col, Modal } from 'react-bootstrap';
 import Form from './components/form';
 import Results from './components/results';
 import Comments from './components/comments';
+import Loader from '../loader';
 import GitHub from '../../services/github';
+import useState from '../../hooks/useState';
 
-class Repositories extends Component {
-  state = {
+const Repositories = () => {
+  const [state, setState] = useState({
     repositories: [],
     isFetchingRepos: false,
     commentsModalOpen: false,
     isFetchingComments: false,
     comments: [],
     query: 'facebook',
-  }
+  });
 
-  componentDidMount() {
-    this.searchResults();
-  }
+  useEffect(() => {
+    searchResults();
+  }, []);
 
-  onSearchFormSubmit = (e) => {
+  const onSearchFormSubmit = (e) => {
     e.preventDefault();
-    this.searchResults();
-  }
+    searchResults();
+  };
 
-  onRepositoryClick = repo => {
-    this.setState({
+  const onRepositoryClick = repo => {
+    setState({
       commentsModalOpen: true,
       isFetchingComments: true, 
     });
@@ -34,97 +36,96 @@ class Repositories extends Component {
       .then(response => {
         const { data } = response;
         const comments = data.sort((curr, prev) => prev.id - curr.id);
-
-        this.setState({
+        setState({
           comments:  comments.slice(0, 5),
           isFetchingComments: false,
         });
       })
       .catch(() => {
-        this.setState({
+        setState({
           comments: [],
           isFetchingComments: false,
         });
       });
   }
 
-  closeModal = () => {
-    this.setState({
+  const closeModal = () => {
+    setState({
       isFetchingComments: true,
       commentsModalOpen: false,
     });
   }
 
-  searchResults = () => {
-    const { query } = this.state;
-    this.setState({
+  const searchResults = () => {
+    const { query } = state;
+    setState({
       isFetchingRepos: true,
     });
 
     GitHub.getRepositories(query)
       .then(response => {
         const { data: { items } } = response;
-        this.setState({
+        setState({
           repositories: items,
           isFetchingRepos: false,
         });
       })
       .catch(() => {
-        this.setState({
+        setState({
           repositories: [],
           isFetchingRepos: false,
         });
       });
   }
 
-  onInputChange = (e) => {
-    this.setState({
+  const onInputChange = (e) => {
+    setState({
       query: e.target.value,
     });
   }
   
-  render() {
-    const {
-      repositories,
-      isFetchingRepos,
-      commentsModalOpen,
-      isFetchingComments,
-      comments,
-      query,
-    } = this.state;
+  const {
+    repositories,
+    isFetchingRepos,
+    commentsModalOpen,
+    isFetchingComments,
+    comments,
+    query,
+  } = state;
 
-    return (
-      <Fragment>
-        <Grid>
-          <Row>
-            <Col xs={12}>
-              <Form
-                inputValue={query}
-                onSubmit={this.onSearchFormSubmit}
-                onInputChange={this.onInputChange}
-              />
-            </Col>
-          </Row>
-          <Results 
-            isLoading={isFetchingRepos}
-            repositories={repositories}
-            onRepositoryClick={this.onRepositoryClick}
-          />
-        </Grid>
-        <Modal show={commentsModalOpen} onHide={this.closeModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Comments</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+  return (
+    <Fragment>
+      <Grid>
+        <Row>
+          <Col xs={12}>
+            <Form
+              inputValue={query}
+              onSubmit={onSearchFormSubmit}
+              onInputChange={onInputChange}
+            />
+          </Col>
+        </Row>
+        <Results 
+          isLoading={isFetchingRepos}
+          repositories={repositories}
+          onRepositoryClick={onRepositoryClick}
+        />
+      </Grid>
+      <Modal show={commentsModalOpen} onHide={closeModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Comments</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Suspense fallback={<Loader />}>
             <Comments 
               isLoading={isFetchingComments}
               comments={comments}
             />
-          </Modal.Body>
-        </Modal>
-      </Fragment>
-    );
-  }
-}
+          </Suspense>
+        </Modal.Body>
+      </Modal>
+    </Fragment>
+  );
+};
 
 export default Repositories;

@@ -1,16 +1,17 @@
-import React, { PureComponent } from 'react';
+import React, { memo } from 'react';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import withLoader from '../.././../../hoc/withLoader';
 import './Results.scss';
 
-class Results extends PureComponent {
-  static defaultProps = {
-    repositories: [],
-  }
+const Results = memo((props) => {
+  const {
+    onRepositoryClick,
+    repositories,
+    isLoading,
+  } = props;
 
-  renderRepository = repo => {
-    const { onRepositoryClick } = this.props;
+  const renderRepository = repo => {
     const { id, owner } = repo;
     const onRePoClick = onRepositoryClick.bind(this, repo);
     return (
@@ -28,38 +29,35 @@ class Results extends PureComponent {
         </Col>
       </Row>
     );
-  }
+  };
 
-  render() {
-    const { repositories } = this.props;
-    return (
-      <Grid className="repo-results">
-        {repositories.length < 1 && (
-          <Row>
-            <Col xs={12} className="no-results">
-              <h3>No results found, try with a new query.</h3>
+  return (
+    <Grid className="repo-results">
+      {repositories.length < 1 && !isLoading && (
+        <Row>
+          <Col xs={12} className="no-results">
+            <h3>No results found, try with a new query.</h3>
+          </Col>
+        </Row>
+      )}
+      {repositories.length > 0 && (
+        <React.Fragment>
+          <Row className="header">
+            <Col xs={4}>
+              <b>Owner</b>
+            </Col>
+            <Col xs={4}>
+              <b>Name</b>
+            </Col>
+            <Col xs={4}>
+              <b>Description</b>
             </Col>
           </Row>
-        )}
-        {repositories.length > 0 && (
-          <React.Fragment>
-            <Row className="header">
-              <Col xs={4}>
-                <b>Owner</b>
-              </Col>
-              <Col xs={4}>
-                <b>Name</b>
-              </Col>
-              <Col xs={4}>
-                <b>Description</b>
-              </Col>
-            </Row>
-            {repositories.map(this.renderRepository)}
-          </React.Fragment>
-        )}
-      </Grid>
-    );
-  }
-}
+          {repositories.map(renderRepository)}
+        </React.Fragment>
+      )}
+    </Grid>
+  );
+});
 
 export default withLoader(Results);

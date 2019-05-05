@@ -1,13 +1,13 @@
-import React, { PureComponent } from 'react';
+import React, { memo } from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 import withLoader from '../../../../hoc/withLoader';
 
-class Results extends PureComponent {
-  static defaultProps = {
-    comments: [],
-  }
+const Comments = memo((props) => {
+  const {
+    comments,
+  } = props;
 
-  renderComment = (comment, i) => {
+  const renderComment = (comment, i) => {
     const { id, body, created_at } = comment;
     const date = new Date(created_at);
     return (
@@ -23,23 +23,20 @@ class Results extends PureComponent {
         </Col>
       </Row>
     );
-  }
+  };
 
-  render() {
-    const { comments } = this.props;
-    return (
-      <Grid fluid>
-        {comments.length < 1 && (
-          <Row>
-            <Col xs={12}>
-              <h3>No comments</h3>
-            </Col>
-          </Row>
-        )}
-        {comments.map(this.renderComment)}
-      </Grid>
-    );
-  }
-}
+  return (
+    <Grid fluid>
+      {comments.length < 1 && (
+        <Row>
+          <Col xs={12}>
+            <h3>No comments</h3>
+          </Col>
+        </Row>
+      )}
+      {comments.map(renderComment)}
+    </Grid>
+  );
+});
 
-export default withLoader(Results);
+export default withLoader(Comments);

@@ -1,46 +1,50 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import GitHub from '../../services/github';
 import UserProfile from './components/userProfile';
+import useState from '../../hooks/useState';
 
-class User extends Component {
-  state = {
+const User = (props) => {
+  const [state, setState] = useState({
     isLoading: false,
     user: {},
     hasError: false,
-  }
+  });
 
-  componentDidMount = () => {
-    const { match: { params: { name } } } = this.props;
+  useEffect(() => {
+    const { match: { params: { name } } } = props;
 
-    this.setState({
+    setState({
       isLoading: true,
     });
 
     GitHub.getUser(name)
       .then(response => {
-        this.setState({
+        setState({
           isLoading: false,
           user: response.data,
         });
       })
       .catch(() => {
-        this.setState({
+        setState({
           isLoading: false,
           hasError: true,
         });
       });
-  }
+  }, []);
 
-  render() {
-    const { user, isLoading, hasError } = this.state;
-    return (
-      <UserProfile
-        user={user}
-        isLoading={isLoading}
-        hasError={hasError}
-      />
-    );
-  }
+  const {
+    user,
+    isLoading,
+    hasError,
+  } = state;
+
+  return (
+    <UserProfile
+      user={user}
+      isLoading={isLoading}
+      hasError={hasError}
+    />
+  );
 }
 
 export default User;
