@@ -1,39 +1,27 @@
-import React, { memo, Fragment } from 'react';
-import { Grid, Row, Col, Image } from 'react-bootstrap';
-import {
-  faMapMarkerAlt, faLink,
-  faStar, faBalanceScale, faCircle
-} from "@fortawesome/free-solid-svg-icons";
+import React, { Fragment } from 'react';
+import { Grid, Row, Col, Image, FormControl } from 'react-bootstrap';
+import { faMapMarkerAlt, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Repo from '../repo';
+import useFilterRepos from '../../../../hooks/useFilterRepos';
 import withLoader from '../.././../../hoc/withLoader';
 import './UserProfile.scss';
 
-const UserProfile = memo((props) => {
+const UserProfile = (props) => {
   const {
     user,
     hasError,
   } = props;
 
+  const [repos, query, setQuery] = useFilterRepos(user.repos || []);
+
+  const onFilterChange = (e) => {
+    const query = e.target.value;
+    setQuery(query);
+  };
+
   const renderRepo = repo => (
-    <div className="repo" key={repo.id}>
-      <h5>{repo.name}</h5>
-      <p>
-        {repo.description}
-      </p>
-      <p>
-        {repo.language && (
-          <span className="info">
-            <FontAwesomeIcon icon={faCircle} /> {repo.language}
-          </span>)}
-        <span className="info">
-          <FontAwesomeIcon icon={faStar} /> {repo.stargazers_count}
-        </span>
-        {repo.license && repo.license.name && (
-          <span className="info">
-            <FontAwesomeIcon icon={faBalanceScale} /> {repo.license.name}
-          </span>)}
-      </p>
-    </div>
+    <Repo key={repo.id} repo={repo} />
   );
 
   return (
@@ -60,15 +48,28 @@ const UserProfile = memo((props) => {
                   <FontAwesomeIcon icon={faLink} /> {user.blog}
                 </span>
               </p>
-              <h4>
-                Repositories
-                     </h4>
-              {(user.repos || []).map(renderRepo)}
+              <Grid fluid>
+                <Row>
+                  <Col xs={6}>
+                    <h4>Repositories</h4>
+                  </Col>
+                  <Col xs={6} className="filter">
+                    <FormControl
+                      type="text"
+                      placeholder="Filter..."
+                      name="query"
+                      value={query}
+                      onChange={onFilterChange}
+                    />
+                  </Col>
+                </Row>
+              </Grid>
+              {repos.map(renderRepo)}
             </Col>
           </Row>
         </Grid>)}
     </Fragment>
   );
-});
+};
 
 export default withLoader(UserProfile);
