@@ -36,7 +36,6 @@ const UserProfile = memo((props) => {
     </div>
   );
 
-
   return (
     <Fragment>
       {hasError && <h3 className="text-center">User not found</h3>}
